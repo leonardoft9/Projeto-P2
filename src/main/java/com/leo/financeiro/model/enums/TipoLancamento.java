@@ -1,4 +1,4 @@
-package com.leo.financeiro.model.entity;
+package com.leo.financeiro.model.enums;
 
 public enum TipoLancamento {
 	
