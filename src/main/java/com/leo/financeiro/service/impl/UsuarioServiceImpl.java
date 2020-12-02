@@ -1,7 +1,11 @@
 package com.leo.financeiro.service.impl;
 
-import org.springframework.stereotype.Service;
+import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.leo.financeiro.exception.ErroAutenticacao;
 import com.leo.financeiro.exception.RegraNegocioException;
 import com.leo.financeiro.model.entity.Usuario;
 import com.leo.financeiro.model.repository.UsuarioRepository;
@@ -19,14 +23,25 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	public Usuario autenticar(String email, String senha) {
-		// TODO Auto-generated method stub
-		return null;
+		Optional<Usuario> usuario = repository.findByEmail(email);
+		
+		if(!usuario.isPresent()) {
+			throw new ErroAutenticacao("Usuario não encontrado.");
+		}
+		
+		if(usuario.get().getSenha().equals(senha)) {
+			throw new ErroAutenticacao("Senha invalida.");
+		}
+		
+		return usuario.get();
+		
 	}
 	
 	@Override
+	@Transactional
 	public Usuario salvarUsuario(Usuario usuario) {
-		// TODO Auto-generated method stub
-		return null;
+		validarEmail(usuario.getEmail());
+		return repository.save(usuario);
 	}
 
 	@Override
