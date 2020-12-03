@@ -1,31 +1,39 @@
 package com.leo.financeiro.model.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.leo.financeiro.model.entity.Usuario;
+import com.leo.financeiro.exception.RegraNegocioException;
 import com.leo.financeiro.model.repository.UsuarioRepository;
 import com.leo.financeiro.service.UsuarioService;
+import com.leo.financeiro.service.impl.UsuarioServiceImpl;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ActiveProfiles("test")
 public class UsuarioServiceTest {
 	
-	@Autowired
+
 	UsuarioService service;
 	
-	@Autowired
+	@MockBean
 	UsuarioRepository repository;
+		
+	@BeforeEach
+	public void setUp() {
+		service = new UsuarioServiceImpl(repository);
+	}
 	
-	@Test()
+	@Test
 	public void deveValidarEmail() {
 		
-		repository.deleteAll();
+		Mockito.when(repository.existsByEmail(Mockito.anyString())).thenReturn(false);
 		
 		service.validarEmail("email@email.com");	
 		
@@ -34,9 +42,10 @@ public class UsuarioServiceTest {
 	@Test
 	public void deveLancarErroAoValidarEmailQuandoExistirEmailCadastrado() {
 		
-		Usuario usuario =  Usuario.builder().nome("üsuario").email("email@email.com").build();
+		Mockito.when(repository.existsByEmail(Mockito.anyString())).thenReturn(true);		
 		
-		service.validarEmail("email@email.com");
+		org.junit.jupiter.api.Assertions
+		.assertThrows(RegraNegocioException.class, () -> service.validarEmail("email@email.com"));
 	}
 	
 
