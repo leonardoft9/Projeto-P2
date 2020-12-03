@@ -1,5 +1,8 @@
 package com.leo.financeiro.model.service;
 
+import java.util.Optional;
+
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.leo.financeiro.exception.RegraNegocioException;
+import com.leo.financeiro.model.entity.Usuario;
 import com.leo.financeiro.model.repository.UsuarioRepository;
 import com.leo.financeiro.service.UsuarioService;
 import com.leo.financeiro.service.impl.UsuarioServiceImpl;
@@ -29,6 +33,20 @@ public class UsuarioServiceTest {
 	public void setUp() {
 		service = new UsuarioServiceImpl(repository);
 	}
+	
+	@Test
+	public void autenticacaoComSucesso() {
+		String email = "email@email.com";
+		String senha = "senha";
+		
+		Usuario usuario = Usuario.builder().email(email).senha(senha).id(1l).build();
+		Mockito.when( repository.findByEmail(email) ).thenReturn(Optional.of(usuario));
+		
+		Usuario result = service.autenticar(email, senha);
+		
+		Assertions.assertThat(result).isNotNull();
+	}
+	
 	
 	@Test
 	public void deveValidarEmail() {
