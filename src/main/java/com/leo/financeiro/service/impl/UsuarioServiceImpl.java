@@ -26,15 +26,14 @@ public class UsuarioServiceImpl implements UsuarioService {
 		Optional<Usuario> usuario = repository.findByEmail(email);
 		
 		if(!usuario.isPresent()) {
-			throw new ErroAutenticacao("Usuario não encontrado.");
+			throw new ErroAutenticacao("Usuário não encontrado para o email informado.");
 		}
 		
-		if(usuario.get().getSenha().equals(senha)) {
-			throw new ErroAutenticacao("Senha invalida.");
+		if(!usuario.get().getSenha().equals(senha)) {
+			throw new ErroAutenticacao("Senha inválida.");
 		}
-		
+
 		return usuario.get();
-		
 	}
 	
 	@Override
