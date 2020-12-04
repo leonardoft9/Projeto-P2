@@ -1,6 +1,7 @@
 package com.leo.financeiro.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.leo.financeiro.model.entity.Lancamento;
 import com.leo.financeiro.model.enums.StatusLancamento;
@@ -18,5 +19,7 @@ public interface LancamentoService {
 	void atualizarStatus(Lancamento lancamento, StatusLancamento status);
 	
 	void validar(Lancamento lancamento);
+	
+	Optional<Lancamento> obterPorId(Long id);
 
 }
