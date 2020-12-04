@@ -35,8 +35,36 @@ public class UsuarioServiceTest {
 	@Test
 	public void deveSalvarUmUsuario() {
 	
+		Mockito.doNothing().when(service).validarEmail(Mockito.anyString());
+		Usuario usuario = Usuario.builder()
+				.id(1l)
+				.nome("nome")
+				.email("email@email.com")
+				.senha("senha")
+				.build();
 		
+		Mockito.when(repository.save(Mockito.any(Usuario.class))).thenReturn(usuario);
 		
+		Usuario usuarioSalvo = service.salvarUsuario(new Usuario());
+		
+		Assertions.assertThat(usuarioSalvo).isNotNull();
+		Assertions.assertThat(usuarioSalvo.getId()).isEqualTo(1l);
+		Assertions.assertThat(usuarioSalvo.getNome()).isEqualTo("nome");
+		Assertions.assertThat(usuarioSalvo.getEmail()).isEqualTo("email@email.com");
+		Assertions.assertThat(usuarioSalvo.getSenha()).isEqualTo("senha");
+		
+	}
+	
+	@Test
+	public void naoSalvaUsuarioComOMesmoEmail() {
+		
+		String email = "email@email.com";
+		Usuario usuario = Usuario.builder().email(email).build();
+		Mockito.doThrow(RegraNegocioException.class).when(service).validarEmail(email);
+		
+		service.salvarUsuario(usuario);
+		
+		Mockito.verify(repository, Mockito.never()).save(usuario);
 	}
 	
 	@Test
