@@ -9,9 +9,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.leo.financeiro.exception.ErroAutenticacao;
 import com.leo.financeiro.exception.RegraNegocioException;
 import com.leo.financeiro.model.entity.Usuario;
 import com.leo.financeiro.model.repository.UsuarioRepository;
@@ -23,15 +25,18 @@ import com.leo.financeiro.service.impl.UsuarioServiceImpl;
 @ActiveProfiles("test")
 public class UsuarioServiceTest {
 	
-
-	UsuarioService service;
+	@SpyBean
+	UsuarioServiceImpl service;
 	
 	@MockBean
 	UsuarioRepository repository;
 		
-	@BeforeEach
-	public void setUp() {
-		service = new UsuarioServiceImpl(repository);
+		
+	@Test
+	public void deveSalvarUmUsuario() {
+	
+		
+		
 	}
 	
 	@Test
@@ -45,6 +50,30 @@ public class UsuarioServiceTest {
 		Usuario result = service.autenticar(email, senha);
 		
 		Assertions.assertThat(result).isNotNull();
+	}
+	
+	@Test
+	public void deveLancarErroQuandoNaoEncontrarUsuarioCadastradoComOEmailInformado() {
+		
+		Mockito.when(repository.findByEmail(Mockito.anyString())).thenReturn(Optional.empty());
+		
+		Throwable exception = Assertions.catchThrowable( () -> service.autenticar("email@email.com", "senha") );
+		
+		Assertions.assertThat(exception)
+		.isInstanceOf(ErroAutenticacao.class).hasMessage("Usuario não encontrado.");
+	}
+	
+	
+	public void deveLancarErroQuandoSenhaErrada() {
+		
+		String senha = "senha";
+		Usuario usuario = Usuario.builder().email("email@email.com").senha(senha).build();
+		Mockito.when(repository.findByEmail(Mockito.anyString())).thenReturn(Optional.of(usuario));
+		
+		Throwable exception =  Assertions.catchThrowable( () -> service.autenticar("email@email.com", "123"));
+		Assertions.assertThat(exception).isInstanceOf(ErroAutenticacao.class).hasMessage("ae");
+		
+		
 	}
 	
 	
