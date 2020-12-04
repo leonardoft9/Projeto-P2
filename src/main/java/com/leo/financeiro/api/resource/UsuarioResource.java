@@ -28,11 +28,10 @@ public class UsuarioResource {
 	public ResponseEntity autenticar( @RequestBody UsuarioDTO dto ) {
 		try {
 			Usuario usuarioAutenticado = service.autenticar(dto.getEmail(), dto.getSenha());
-			return ResponseEntity.ok(usuarioAutenticado);
+			return new ResponseEntity(usuarioAutenticado, HttpStatus.OK);
 		}catch (ErroAutenticacao e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
-		
 	}
 	
 	@PostMapping
