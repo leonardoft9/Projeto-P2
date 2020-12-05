@@ -1,5 +1,8 @@
 package com.leo.financeiro.api.resource;
 
+import java.math.BigDecimal;
+import java.util.Optional;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +16,7 @@ import com.leo.financeiro.api.dto.UsuarioDTO;
 import com.leo.financeiro.exception.ErroAutenticacao;
 import com.leo.financeiro.exception.RegraNegocioException;
 import com.leo.financeiro.model.entity.Usuario;
+import com.leo.financeiro.service.LancamentoService;
 import com.leo.financeiro.service.UsuarioService;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class UsuarioResource {
 	
 	private final UsuarioService service;
+	private final LancamentoService lancamentoservice;
 	
 	@PostMapping("/autenticar")
 	public ResponseEntity autenticar( @RequestBody UsuarioDTO dto ) {
@@ -54,6 +59,13 @@ public class UsuarioResource {
 	
 	@GetMapping("{id}/saldo")
 	public ResponseEntity obterSaldo(@PathVariable("id") Long id) {
+		Optional<Usuario> usuario = service.obterPorId(id);
 		
+		if(!usuario.isPresent()) {
+			return new ResponseEntity(HttpStatus.NOT_FOUND);
+		}
+		
+		BigDecimal saldo = lancamentoservice.obtersaldoPorUsuario(id);
+		return ResponseEntity.ok(saldo);
 	}
 }
