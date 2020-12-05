@@ -1,5 +1,6 @@
 package com.leo.financeiro.api.resource;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -23,17 +24,16 @@ import com.leo.financeiro.model.enums.TipoLancamento;
 import com.leo.financeiro.service.LancamentoService;
 import com.leo.financeiro.service.UsuarioService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/api/lancamentos")
+@RequiredArgsConstructor
 public class LancamentoResource {
 
-	private LancamentoService service;
-	private UsuarioService usuarioService;
-	
-	public LancamentoResource(LancamentoService service) {
-		this.service = service;
-	}
-	
+	private final LancamentoService service;
+	private final UsuarioService usuarioService;
+		
 	@GetMapping
 	public ResponseEntity buscar(
 			@RequestParam(value ="descricao" ,  required = false) String descricao,
@@ -41,6 +41,7 @@ public class LancamentoResource {
 			@RequestParam(value ="ano" ,  required = false) Integer ano,
 			@RequestParam("usuario") Long idUsuario
 			) {
+		
 		Lancamento lancamentoFiltro = new Lancamento();
 		lancamentoFiltro.setDescricao(descricao);
 		lancamentoFiltro.setMes(mes);
@@ -55,7 +56,8 @@ public class LancamentoResource {
 			lancamentoFiltro.setUsuario(usuario.get());
 		}
 		
-		service.buscar(lancamentoFiltro);
+		List<Lancamento> lancamentos = service.buscar(lancamentoFiltro);
+		return ResponseEntity.ok(lancamentos);
 	}
 	
 	@PostMapping
@@ -106,9 +108,14 @@ public class LancamentoResource {
 		.orElseThrow( () -> new RegraNegocioException("Usuario não encontrado para o id informado") );
 		
 		lancamento.setUsuario(usuario);
-		lancamento.setTipo(TipoLancamento.valueOf(dto.getTipo()));
-		lancamento.setStatus(StatusLancamento.valueOf(dto.getStatus()));
 		
+		if(dto.getTipo() != null) {
+		lancamento.setTipo(TipoLancamento.valueOf(dto.getTipo()));
+		}
+		
+		if(dto.getStatus() != null) {
+		lancamento.setStatus(StatusLancamento.valueOf(dto.getStatus()));
+		}
 		return lancamento;
 	}
 }
