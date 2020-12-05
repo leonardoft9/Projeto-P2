@@ -8,7 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-@Data
 public class UsuarioDTO {
 
 	private String email;
