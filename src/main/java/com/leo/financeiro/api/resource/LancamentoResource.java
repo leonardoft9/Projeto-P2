@@ -65,7 +65,7 @@ public class LancamentoResource {
 					.map( lancamento -> new ResponseEntity(converter(lancamento), HttpStatus.OK) )
 					.orElseGet( () -> new ResponseEntity(HttpStatus.NOT_FOUND) );
 	}
-
+	
 	@PostMapping
 	public ResponseEntity salvar( @RequestBody LancamentoDTO dto ) {
 		try {
