@@ -16,9 +16,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.leo.financeiro.model.entity.Usuario;
 
 @ExtendWith(SpringExtension.class)
+@ActiveProfiles("test")
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
-@ActiveProfiles("test")
 public class UsuarioRepositoryTest {
 	
 	@Autowired
@@ -27,53 +27,65 @@ public class UsuarioRepositoryTest {
 	@Autowired
 	TestEntityManager entityManager;
 	
-	
 	@Test
-	public void deveVerificarEmail() {
+	public void deveVerificarAExistenciaDeUmEmail() {
+		//cenário
 		Usuario usuario = criarUsuario();
 		entityManager.persist(usuario);
 		
+		//ação/ execução
 		boolean result = repository.existsByEmail("usuario@email.com");
 		
-		Assertions.assertThat(result).isTrue();		
+		//verificacao
+		Assertions.assertThat(result).isTrue();
+		
 	}
-
+	
 	@Test
-	public void deveRetornarFalsoQuandoNaoHouveUsuarioCadastradoComOEmail() {
-			
+	public void deveRetornarFalsoQuandoNaoHouverUsuarioCadastradoComOEmail() {
+		//cenário
+		
+		//acao
 		boolean result = repository.existsByEmail("usuario@email.com");
 		
+		//verificacao
 		Assertions.assertThat(result).isFalse();
 	}
 	
 	@Test
 	public void devePersistirUmUsuarioNaBaseDeDados() {
+		//cenário
+		Usuario usuario =criarUsuario();
 		
-		Usuario usuario = criarUsuario();
-		
+		//acao
 		Usuario usuarioSalvo = repository.save(usuario);
 		
+		// verificacao
 		Assertions.assertThat(usuarioSalvo.getId()).isNotNull();
 	}
 	
 	@Test
 	public void deveBuscarUmUsuarioPorEmail() {
+		//cenario
 		Usuario usuario = criarUsuario();
 		entityManager.persist(usuario);
 		
+		//verificacao
 		Optional<Usuario> result = repository.findByEmail("usuario@email.com");
 		
 		Assertions.assertThat( result.isPresent() ).isTrue();
+		
 	}
 	
 	@Test
 	public void deveRetornarVazioAoBuscarUsuarioPorEmailQuandoNaoExisteNaBase() {
-				
+		
+		//verificacao
 		Optional<Usuario> result = repository.findByEmail("usuario@email.com");
 		
 		Assertions.assertThat( result.isPresent() ).isFalse();
+		
 	}
-	
 	
 	public static Usuario criarUsuario() {
 		return Usuario
@@ -81,7 +93,7 @@ public class UsuarioRepositoryTest {
 				.nome("usuario")
 				.email("usuario@email.com")
 				.senha("senha")
-				.build();	
+				.build();
 	}
-		
+
 }
